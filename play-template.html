@@ -1,0 +1,180 @@
+<!--
+  play-applesoft.html — Apple II Applesoft BASIC player template (setup_basic.py)
+
+  Tokens: TITLE, VERSION_LABEL, BACK_HREF, GAME_SOURCE
+  Engine: Joshua Bell's Applesoft BASIC interpreter (https://github.com/inexorabletash/jsbasic)
+  Embedding: CDN script.js auto-creates Apple II display from <script type="text/applesoft-basic">
+  Supports: Applesoft BASIC (Apple II) — TEXT, GR, HGR modes, INPUT, GET
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>__TITLE__</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #0a0a0a;
+  color: #d4c5a9;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.header h1 {
+  font-size: 0.95em;
+  color: #c4b48a;
+  white-space: nowrap;
+}
+
+.header .version {
+  font-size: 0.75em;
+  color: #887755;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.header .back a {
+  font-size: 0.75em;
+  color: #887755;
+  text-decoration: none;
+  border-bottom: 1px solid #3a3020;
+}
+
+.header .back a:hover {
+  color: #e8d090;
+  border-bottom-color: #aa9966;
+}
+
+#screen-container {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  overflow: hidden;
+}
+
+/* Strip the Apple II bezel — just show the screen */
+#screen-container .jsb-frame {
+  outline: none;
+  transform-origin: center center;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+#screen-container .jsb-frame > * {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#loadingpane {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 35%;
+  color: #887755;
+  font-size: 1.2em;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+#loadingpane em {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+noscript {
+  text-align: center;
+  padding: 40px;
+  color: #aa6644;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>__TITLE__</h1>
+  <span class="version">Applesoft BASIC</span>
+  <span class="back"><a href="./">&larr; Back</a></span>
+</div>
+
+<noscript>
+  <h2>Apple Adventure</h2>
+  <p>JavaScript is required to play this game.</p>
+</noscript>
+
+<div id="screen-container">
+  <div id="loadingpane">
+    <em>Loading Apple II...</em>
+  </div>
+
+  <!--
+    jsbasic CDN: auto-creates Apple II display frame from inline BASIC source.
+    See https://github.com/inexorabletash/jsbasic/blob/main/script.md
+  -->
+  <script src="https://inexorabletash.github.io/jsbasic/script.js"></script>
+  <script type="text/applesoft-basic">
+__BASIC_SOURCE__
+  </script>
+</div>
+
+<script>
+// Scale the jsbasic frame to fill the container
+function scaleFrame() {
+  var container = document.getElementById('screen-container');
+  var frame = container && container.querySelector('.jsb-frame');
+  if (!frame) return;
+  // Reset scale to measure natural size
+  frame.style.transform = 'none';
+  var cw = container.clientWidth - 12; // account for padding
+  var ch = container.clientHeight - 12;
+  var fw = frame.offsetWidth;
+  var fh = frame.offsetHeight;
+  if (fw > 0 && fh > 0) {
+    var scale = Math.min(cw / fw, ch / fh);
+    frame.style.transform = 'scale(' + scale + ')';
+  }
+}
+
+window.addEventListener('load', function() {
+  var lp = document.getElementById('loadingpane');
+  if (lp) lp.style.display = 'none';
+
+  var frame = document.querySelector('.jsb-frame');
+  if (frame) frame.focus();
+
+  scaleFrame();
+});
+window.addEventListener('resize', scaleFrame);
+</script>
+
+</body>
+</html>
